@@ -1,0 +1,7 @@
+# 网关服务镜像（结构同 base/production，拷贝对应模块的 jar）
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY litemes-gateway/target/litemes-gateway-*.jar app.jar
+EXPOSE 8080
+# 2C 云服务器上限制 JVM 内存，防止与 Nacos/MySQL 抢内存
+ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-jar", "app.jar"]

@@ -1,0 +1,104 @@
+# ============================================================
+# LiteMES 项目忽略规则
+# 覆盖：后端 Maven / 前端 Node / IDE / 系统文件 / 敏感配置 / 日志
+# ============================================================
+
+# ---------- 后端 Maven ----------
+target/
+**/target/
+*.jar
+*.war
+*.ear
+*.class
+mvnw
+mvnw.cmd
+.mvn/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+# ---------- 前端 Node / Vite ----------
+node_modules/
+dist/
+dist-ssr/
+.vite/
+coverage/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.cache/
+.temp/
+
+# 本地环境变量（.env.development / .env.production 等提交模板保留）
+.env.local
+.env.*.local
+!.env.example
+
+# ---------- IDE ----------
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.factorypath
+nbproject/private/
+nbbuild/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+.idea_modules/
+
+# ---------- 系统文件 ----------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---------- 日志 ----------
+logs/
+*.log
+spring.log
+nohup.out
+hs_err_pid*
+
+# ---------- 敏感配置（防止本地覆盖配置 / 密钥被提交） ----------
+# 保留 *.example 模板，忽略实际本地配置
+**/application-local.yml
+**/application-local.yaml
+**/application-local.properties
+**/application-dev.yml
+**/application-dev.yaml
+**/application-prod.yml
+**/application-prod.yaml
+**/application-test.yml
+**/application-test.yaml
+.env
+!.env.example
+
+# ---------- 数据库 / 上传文件 ----------
+*.sql.bak
+upload/
+download/
+static/upload/
+
+# ---------- 临时文件 ----------
+*.bak
+*.tmp
+*.orig
+*.rej
+*.part
+*.pid

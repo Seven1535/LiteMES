@@ -1,0 +1,6 @@
+# 基础数据服务镜像
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY litemes-base/target/litemes-base-*.jar app.jar
+EXPOSE 8081
+ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-jar", "app.jar"]

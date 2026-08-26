@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.litemes</groupId>
+        <artifactId>lite-mes</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>litemes-api</artifactId>
+    <name>litemes-api</name>
+    <description>Feign 接口契约模块：只含接口 + DTO，禁止业务实现（见《开发规范说明文档》3.7）</description>
+
+    <dependencies>
+        <!-- @FeignClient 注解 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!-- DTO 简化 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>

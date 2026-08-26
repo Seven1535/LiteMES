@@ -1,0 +1,6 @@
+# 业务数据服务镜像（含 WebSocket）
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY litemes-production/target/litemes-production-*.jar app.jar
+EXPOSE 8082
+ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-jar", "app.jar"]

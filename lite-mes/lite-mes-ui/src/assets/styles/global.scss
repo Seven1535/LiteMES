@@ -1,0 +1,49 @@
+// 全局样式：重置 + 通用布局类
+@use './variables.scss' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  font-size: 14px;
+  color: $text-color;
+  background-color: $page-bg;
+}
+
+// 页面通用容器：所有内容页统一使用
+.page-container {
+  padding: 16px;
+}
+
+// 搜索栏统一风格
+.filter-bar {
+  background: $card-bg;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+// 表格卡片统一风格
+.table-card {
+  background: $card-bg;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+// 表格工具栏（标题/新增按钮所在行）
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}

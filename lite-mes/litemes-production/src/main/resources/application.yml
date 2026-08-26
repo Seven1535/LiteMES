@@ -1,0 +1,37 @@
+# 业务数据服务默认配置（本地开发用；生产环境由 Nacos 的 litemes-production.yml 覆盖）
+server:
+  port: 8082
+
+spring:
+  datasource:
+    # 达梦切换示例：url: jdbc:dm://{host}:5236/LITEMES_PRODUCTION，driver-class-name: dm.jdbc.driver.DmDriver
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/litemes_production?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      # 学习项目用 update 自动同步表结构；生产上线需改为 validate/none + 独立迁移脚本
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+# JWT 与鉴权（生产环境由 Nacos 覆盖）
+litemes:
+  jwt:
+    secret: ${JWT_SECRET:litemes-default-secret-key-change-me-please}
+    expire-hours: 24
+  security:
+    whitelist:
+      - /swagger-ui/**
+      - /v3/api-docs/**
