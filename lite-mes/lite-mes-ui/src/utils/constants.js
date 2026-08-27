@@ -40,7 +40,10 @@ export const STATUS_MAP = {
   RUNNING: { text: '运行中', type: 'warning' },
   FAULT: { text: '故障', type: 'danger' },
   MAINTENANCE: { text: '维护中', type: 'info' },
-  OFFLINE: { text: '离线', type: 'info' }
+  OFFLINE: { text: '离线', type: 'info' },
+  // 用户状态
+  ENABLED: { text: '启用', type: 'success' },
+  DISABLED: { text: '停用', type: 'danger' }
 }
 
 // 分页

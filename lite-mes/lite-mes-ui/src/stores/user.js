@@ -1,6 +1,6 @@
 // 用户状态：Token、用户信息、登录/退出
 import { defineStore } from 'pinia'
-import { login as loginApi } from '@/api/auth'
+import { login as loginApi, logout as logoutApi } from '@/api/auth'
 import { getToken, setToken, setStoredUser, clearAuth, getStoredUser } from '@/utils/auth'
 
 export const useUserStore = defineStore('user', {
@@ -22,7 +22,13 @@ export const useUserStore = defineStore('user', {
       setToken(data.token)
       setStoredUser(data.user)
     },
-    logout() {
+    // 登出：先调后端拉黑 Token（网关立即强制下线），失败也清本地（如 Token 已过期）
+    async logout() {
+      try {
+        await logoutApi()
+      } catch (e) {
+        // 忽略：拉黑失败不影响本地清理
+      }
       this.token = ''
       this.user = null
       clearAuth()

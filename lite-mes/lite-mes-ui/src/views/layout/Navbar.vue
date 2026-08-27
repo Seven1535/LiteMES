@@ -26,6 +26,7 @@
 </template>
 
 <script setup>
+import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useUserStore } from '@/stores/user'
@@ -35,9 +36,10 @@ const router = useRouter()
 const appStore = useAppStore()
 const userStore = useUserStore()
 
-function handleCommand(command) {
+async function handleCommand(command) {
   if (command === 'logout') {
-    userStore.logout()
+    await ElMessageBox.confirm('确定退出登录吗？', '提示', { type: 'warning' })
+    await userStore.logout()
     router.push('/login')
   }
 }
