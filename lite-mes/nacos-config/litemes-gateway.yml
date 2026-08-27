@@ -1,0 +1,29 @@
+# Gateway config (Data ID = litemes-gateway.yml, namespace litemes-dev)
+# Content: routes, gateway auth whitelist
+spring:
+  cloud:
+    gateway:
+      routes:
+        # base data service
+        - id: litemes-base
+          uri: lb://litemes-base
+          predicates:
+            - Path=/api/v1/base/**
+        # production service
+        - id: litemes-production
+          uri: lb://litemes-production
+          predicates:
+            - Path=/api/v1/prod/**
+        # WebSocket push (served by litemes-production)
+        - id: litemes-production-ws
+          uri: lb://litemes-production
+          predicates:
+            - Path=/ws/**
+
+litemes:
+  security:
+    whitelist:
+      - /api/v1/base/auth/login
+      - /swagger-ui/**
+      - /v3/api-docs/**
+      - /doc.html

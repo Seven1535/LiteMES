@@ -1,0 +1,13 @@
+# Nacos shared config (imported via shared-configs in bootstrap.yml of all services)
+# Content: Redis connection, JWT secret & expiration
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:UfcRpcs}
+
+litemes:
+  jwt:
+    secret: ${JWT_SECRET:litemes-dev-secret-2026-change-in-production}
+    expire-hours: 24

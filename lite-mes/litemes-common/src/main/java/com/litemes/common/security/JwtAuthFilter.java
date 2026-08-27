@@ -2,19 +2,18 @@ package com.litemes.common.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.litemes.common.config.JpaAuditConfig.JwtConstants;
+import com.litemes.common.config.SecurityProperties;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * 下游服务兜底鉴权过滤器（第二道防线，第一道是网关 AuthGlobalFilter）。
@@ -30,15 +29,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
-
-    /** 免鉴权路径（ANT 风格），由各服务配置文件覆盖 */
-    @Value("${litemes.security.whitelist:}")
-    private List<String> whitelist;
+    private final SecurityProperties securityProperties;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return whitelist.stream().anyMatch(pattern -> pathMatcher(pattern, path));
+        return securityProperties.getWhitelist().stream().anyMatch(pattern -> pathMatcher(pattern, path));
     }
 
     @Override

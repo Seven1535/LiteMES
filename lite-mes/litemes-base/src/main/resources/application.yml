@@ -1,14 +1,14 @@
-# 基础数据服务默认配置（本地开发用；生产环境由 Nacos 的 litemes-base.yml 覆盖）
+# 基础数据服务兜底配置（Nacos 的 litemes-base.yml 优先；仅在 Nacos 配置不可用时生效）
 server:
   port: 8081
 
 spring:
   datasource:
-    # 达梦切换示例：url: jdbc:dm://{host}:5236/LITEMES_BASE，driver-class-name: dm.jdbc.driver.DmDriver
-    url: jdbc:mysql://${DB_HOST:localhost}:3306/litemes_base?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 达梦：用户即 schema（连接串 ?schema= 决定 SQL 执行的默认 schema）
+    url: jdbc:dm://${DB_HOST:localhost}:5236?schema=LITEMES_BASE
+    username: ${DB_USERNAME:LITEMES_BASE}
+    password: ${DB_PASSWORD:123456789}
+    driver-class-name: dm.jdbc.driver.DmDriver
   jpa:
     hibernate:
       # 学习项目用 update 自动同步表结构；生产上线需改为 validate/none + 独立迁移脚本
@@ -16,19 +16,22 @@ spring:
     open-in-view: false
     properties:
       hibernate:
+        # 自定义达梦方言（基于 MySQL 方言）：恢复 schema 限定 + 去掉 engine=InnoDB 子句，见 DamengDialect 注释
+        dialect: com.litemes.common.jpa.DamengDialect
+        # 注意：达梦为多项目共享实例，元数据探测不可靠，表所属 schema 由实体 @Table(schema=DbSchema.NAME) 显式声明，不依赖 default_schema
         # 物理命名：camelCase 属性 → SNAKE_CASE 列（与《开发规范说明文档》3.5 一致）
         physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
+      password: ${REDIS_PASSWORD:UfcRpcs}
   # Swagger UI 路径（springdoc 2.x 兼容）
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
 
-# JWT 与鉴权（生产环境由 Nacos 覆盖）
+# JWT 与鉴权（Nacos 的 litemes-common.yml 优先）
 litemes:
   jwt:
     secret: ${JWT_SECRET:litemes-default-secret-key-change-me-please}
@@ -38,3 +41,8 @@ litemes:
       - /api/v1/base/auth/login
       - /swagger-ui/**
       - /v3/api-docs/**
+
+# Feign：启用熔断，使 ReferenceCheckClient 的 fallback 生效（production 不可用时删除保护安全优先）
+feign:
+  circuitbreaker:
+    enabled: true

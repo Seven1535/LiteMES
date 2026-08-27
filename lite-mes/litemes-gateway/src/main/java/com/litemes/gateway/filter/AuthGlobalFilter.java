@@ -1,5 +1,6 @@
 package com.litemes.gateway.filter;
 
+import com.litemes.gateway.config.GatewaySecurityProperties;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 /**
  * JWT 全局鉴权过滤器（第一道防线，见《架构设计说明书》3.5）：
@@ -40,13 +40,11 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     @Value("${litemes.jwt.secret:litemes-default-secret-key-change-me-please}")
     private String jwtSecret;
 
-    /** 鉴权白名单路径（ANT 风格），生产环境由 Nacos 的 litemes-gateway.yml 下发 */
-    @Value("${litemes.security.whitelist:}")
-    private List<String> whitelist;
-
+    private final GatewaySecurityProperties securityProperties;
     private final ReactiveStringRedisTemplate redisTemplate;
 
-    public AuthGlobalFilter(ReactiveStringRedisTemplate redisTemplate) {
+    public AuthGlobalFilter(GatewaySecurityProperties securityProperties, ReactiveStringRedisTemplate redisTemplate) {
+        this.securityProperties = securityProperties;
         this.redisTemplate = redisTemplate;
     }
 
@@ -97,7 +95,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     }
 
     private boolean isWhitelisted(String path) {
-        return whitelist.stream().anyMatch(pattern -> PATH_MATCHER.match(pattern, path));
+        return securityProperties.getWhitelist().stream().anyMatch(pattern -> PATH_MATCHER.match(pattern, path));
     }
 
     private Mono<Void> unauthorized(ServerWebExchange exchange) {

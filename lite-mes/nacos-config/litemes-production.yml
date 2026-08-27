@@ -1,0 +1,25 @@
+# Production service config (Data ID = litemes-production.yml, namespace litemes-dev)
+# Content: DM datasource, JPA dialect, downstream auth whitelist
+spring:
+  datasource:
+    # DM: user = schema (?schema= decides the default schema of SQL execution)
+    url: jdbc:dm://${DB_HOST:localhost}:5236?schema=LITEMES_PRODUCTION
+    username: ${DB_USERNAME:LITEMES_PRODUCTION}
+    password: ${DB_PASSWORD:123456789}
+    driver-class-name: dm.jdbc.driver.DmDriver
+  jpa:
+    hibernate:
+      # update = auto sync schema (learning project); production should use validate/none + migration scripts
+      ddl-auto: update
+    properties:
+      hibernate:
+        # Custom DM dialect (extends MySQLDialect): restore schema qualification and drop engine=InnoDB clause
+        dialect: com.litemes.common.jpa.DamengDialect
+        # NOTE: DM is a shared multi-project instance and metadata probing is unreliable;
+        # table schema is declared explicitly via @Table(schema=DbSchema.NAME), not default_schema
+
+litemes:
+  security:
+    whitelist:
+      - /swagger-ui/**
+      - /v3/api-docs/**

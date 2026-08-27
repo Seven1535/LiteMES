@@ -5,13 +5,17 @@ spring:
   cloud:
     nacos:
       server-addr: ${NACOS_ADDR:localhost:8848}
-      username: ${NACOS_USERNAME:nacos}
-      password: ${NACOS_PASSWORD:nacos}
+      # Nacos 未开启鉴权（auth_enabled=false）时不要配 username/password，否则客户端登录报 user not found；
+      # 开启鉴权后再通过环境变量 NACOS_USERNAME/NACOS_PASSWORD 注入
       discovery:
         server-addr: ${NACOS_ADDR:localhost:8848}
       config:
         server-addr: ${NACOS_ADDR:localhost:8848}
         file-extension: yml
-        # 生产环境：路由规则、白名单、JWT 密钥收口到 Nacos 的 litemes-gateway.yml
-        # 本地开发：使用本服务 application.yml 中的默认配置
-        enabled: ${NACOS_CONFIG_ENABLED:false}
+        # 命名空间 litemes-dev；主配置 = litemes-gateway.yml（路由、白名单收口于此）
+        namespace: ${NACOS_NAMESPACE:litemes-dev}
+        enabled: ${NACOS_CONFIG_ENABLED:true}
+        # 共享配置：Redis（黑名单查询）、JWT 密钥等公共项
+        shared-configs:
+          - data-id: litemes-common.yml
+            refresh: true

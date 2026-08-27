@@ -1,0 +1,31 @@
+# Base service config (Data ID = litemes-base.yml, namespace litemes-dev)
+# Content: DM datasource, JPA dialect, downstream auth whitelist
+spring:
+  datasource:
+    # DM: user = schema (?schema= decides the default schema of SQL execution)
+    url: jdbc:dm://${DB_HOST:localhost}:5236?schema=LITEMES_BASE
+    username: ${DB_USERNAME:LITEMES_BASE}
+    password: ${DB_PASSWORD:123456789}
+    driver-class-name: dm.jdbc.driver.DmDriver
+  jpa:
+    hibernate:
+      # update = auto sync schema (learning project); production should use validate/none + migration scripts
+      ddl-auto: update
+    properties:
+      hibernate:
+        # Custom DM dialect (extends MySQLDialect): restore schema qualification and drop engine=InnoDB clause
+        dialect: com.litemes.common.jpa.DamengDialect
+        # NOTE: DM is a shared multi-project instance and metadata probing is unreliable;
+        # table schema is declared explicitly via @Table(schema=DbSchema.NAME), not default_schema
+
+litemes:
+  security:
+    whitelist:
+      - /api/v1/base/auth/login
+      - /swagger-ui/**
+      - /v3/api-docs/**
+
+# Feign: enable circuit breaker so ReferenceCheckClient fallback works (safe-first delete protection)
+feign:
+  circuitbreaker:
+    enabled: true

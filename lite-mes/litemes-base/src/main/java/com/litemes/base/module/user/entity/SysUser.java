@@ -1,5 +1,6 @@
 package com.litemes.base.module.user.entity;
 
+import com.litemes.base.config.DbSchema;
 import com.litemes.common.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,11 +12,12 @@ import lombok.Setter;
  * 系统用户（对应《设计规格说明书》5.2 SYS_USER 表）。
  * 角色：ADMIN=管理员（全部功能），OPERATOR=操作工（看板+我的任务）。
  * 状态：ENABLED=启用，DISABLED=停用。
+ * schema 必须显式声明：达梦为多项目共享实例，不带 schema 的元数据探测会误命中其他用户的同名表。
  */
 @Getter
 @Setter
 @Entity
-@Table(name = "SYS_USER")
+@Table(name = "SYS_USER", schema = DbSchema.NAME)
 public class SysUser extends BaseEntity {
 
     /** 登录账号（唯一，业务层保证） */

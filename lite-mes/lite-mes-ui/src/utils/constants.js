@@ -43,7 +43,10 @@ export const STATUS_MAP = {
   OFFLINE: { text: '离线', type: 'info' },
   // 用户状态
   ENABLED: { text: '启用', type: 'success' },
-  DISABLED: { text: '停用', type: 'danger' }
+  DISABLED: { text: '停用', type: 'danger' },
+  // 产品状态
+  ACTIVE: { text: '启用', type: 'success' },
+  INACTIVE: { text: '停用', type: 'info' }
 }
 
 // 分页
