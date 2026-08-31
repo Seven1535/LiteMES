@@ -16,4 +16,8 @@ public interface WorkflowClient {
     /** 查询产品当前生效的工艺版本（工单创建时锁定） */
     @GetMapping("/workflows/{productId}/active")
     WorkflowDTO getActiveWorkflow(@PathVariable("productId") String productId);
+
+    /** 按版本 ID 查工艺路线（工单锁定的可能是历史版本，列表聚合用） */
+    @GetMapping("/workflows/by-id/{workflowId}")
+    WorkflowDTO getWorkflow(@PathVariable("workflowId") String workflowId);
 }

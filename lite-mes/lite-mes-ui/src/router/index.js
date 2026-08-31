@@ -34,6 +34,12 @@ const routes = [
         meta: { title: '工艺路线', icon: 'Share', roles: ['ADMIN'] }
       },
       {
+        path: 'process/editor/:workflowId',
+        name: 'ProcessEditor',
+        component: () => import('@/views/process/editor.vue'),
+        meta: { title: '工艺编辑器', hidden: true, roles: ['ADMIN'] }
+      },
+      {
         path: 'workcenter',
         name: 'WorkCenter',
         component: () => import('@/views/workcenter/index.vue'),

@@ -4,6 +4,9 @@ import com.litemes.api.base.dto.WorkflowStepDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * 工序步骤契约（litemes-base 内部接口）。
@@ -16,4 +19,8 @@ public interface WorkflowStepClient {
     /** 查询工序详情（报工时获取工序信息用于进度汇总） */
     @GetMapping("/workflow-steps/{id}")
     WorkflowStepDTO getStep(@PathVariable("id") String id);
+
+    /** 按工艺版本查工序列表（按顺序，工单详情/派工列表用） */
+    @GetMapping("/workflow-steps")
+    List<WorkflowStepDTO> listByWorkflow(@RequestParam("workflowId") String workflowId);
 }

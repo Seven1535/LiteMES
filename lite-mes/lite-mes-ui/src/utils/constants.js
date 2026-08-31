@@ -18,13 +18,18 @@ export const TASK_STATUS = {
   CLOSED: 'CLOSED'
 }
 
-// 设备状态
+// 工位状态（与设计规格 WORK_CENTER 表对齐）
 export const WORKCENTER_STATUS = {
   IDLE: 'IDLE',
-  RUNNING: 'RUNNING',
-  FAULT: 'FAULT',
-  MAINTENANCE: 'MAINTENANCE',
+  BUSY: 'BUSY',
   OFFLINE: 'OFFLINE'
+}
+
+// 工艺路线版本状态（与设计规格 WORKFLOW 表对齐）
+export const WORKFLOW_STATUS = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED'
 }
 
 // 状态 → 文案 + el-tag 类型 统一映射
@@ -37,16 +42,17 @@ export const STATUS_MAP = {
   PENDING: { text: '待开始', type: 'info' },
   PROCESSING: { text: '加工中', type: 'warning' },
   IDLE: { text: '空闲', type: 'success' },
-  RUNNING: { text: '运行中', type: 'warning' },
-  FAULT: { text: '故障', type: 'danger' },
-  MAINTENANCE: { text: '维护中', type: 'info' },
+  BUSY: { text: '忙碌', type: 'warning' },
   OFFLINE: { text: '离线', type: 'info' },
   // 用户状态
   ENABLED: { text: '启用', type: 'success' },
   DISABLED: { text: '停用', type: 'danger' },
   // 产品状态
   ACTIVE: { text: '启用', type: 'success' },
-  INACTIVE: { text: '停用', type: 'info' }
+  INACTIVE: { text: '停用', type: 'info' },
+  // 工艺版本状态（ACTIVE 在产品语境为“启用”，工艺语境为“生效”，统一映射后页面可自定义文案）
+  DRAFT: { text: '草稿', type: 'info' },
+  ARCHIVED: { text: '已归档', type: 'warning' }
 }
 
 // 分页

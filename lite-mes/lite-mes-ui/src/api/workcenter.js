@@ -21,6 +21,11 @@ export function updateWorkCenter(id, data) {
   return request.put(`/v1/base/workcenters/${id}`, data)
 }
 
+// 更新设备状态（IDLE / BUSY / OFFLINE，派工联动与手工停用）
+export function updateWorkCenterStatus(id, status) {
+  return request.put(`/v1/base/workcenters/${id}/status`, { status })
+}
+
 // 删除设备（后端校验是否有任务引用）
 export function deleteWorkCenter(id) {
   return request.delete(`/v1/base/workcenters/${id}`)

@@ -17,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 /**
  * 产品业务：标准分页查询 / 新增 / 修改 / 逻辑删除（删除前走 production 引用校验）。
  */
@@ -68,6 +70,7 @@ public class ProductService {
             throw new BusinessException(400, "产品编码已存在：" + code);
         }
         Product product = new Product();
+        product.setId(UUID.randomUUID().toString());
         product.setProductCode(code);
         product.setProductName(request.getProductName().trim());
         product.setDescription(trimToNull(request.getDescription()));
