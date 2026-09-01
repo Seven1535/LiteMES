@@ -13,9 +13,10 @@ public interface WorkflowRepository extends JpaRepository<Workflow, String> {
 
     Optional<Workflow> findByProductIdAndVersion(String productId, Integer version);
 
-    Optional<Workflow> findFirstByProductIdAndIsActiveTrue(String productId);
+    // 注意：达梦不支持布尔列直接作谓词（-4104），必须用参数化绑定而非 IsActiveTrue 派生写法
+    Optional<Workflow> findFirstByProductIdAndIsActive(String productId, Boolean isActive);
 
     List<Workflow> findByProductIdAndStatus(String productId, String status);
 
-    Optional<Integer> findTopByProductIdOrderByVersionDesc(String productId);
+    Optional<Workflow> findTopByProductIdOrderByVersionDesc(String productId);
 }

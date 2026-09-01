@@ -24,7 +24,7 @@ public class WorkflowInnerController {
     /** 对应契约：GET /inner/workflows/{productId}/active */
     @GetMapping("/workflows/{productId}/active")
     public WorkflowDTO getActiveWorkflow(@PathVariable String productId) {
-        Workflow workflow = workflowRepository.findFirstByProductIdAndIsActiveTrue(productId)
+        Workflow workflow = workflowRepository.findFirstByProductIdAndIsActive(productId, Boolean.TRUE)
                 .orElseThrow(() -> new BusinessException(404, "该产品暂无生效的工艺版本"));
         WorkflowDTO dto = new WorkflowDTO();
         dto.setId(workflow.getId());

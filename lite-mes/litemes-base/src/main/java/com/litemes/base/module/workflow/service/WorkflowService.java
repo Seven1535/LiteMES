@@ -87,7 +87,7 @@ public class WorkflowService {
     /** 产品当前生效版本（工单创建时锁定；无生效版本返回 404） */
     public WorkflowDetailVO activeByProduct(String productId) {
         loadProduct(productId);
-        Workflow active = workflowRepository.findFirstByProductIdAndIsActiveTrue(productId)
+        Workflow active = workflowRepository.findFirstByProductIdAndIsActive(productId, Boolean.TRUE)
                 .orElseThrow(() -> new BusinessException(404, "该产品暂无生效的工艺版本"));
         return detail(active.getId());
     }
@@ -96,7 +96,8 @@ public class WorkflowService {
     @Transactional
     public WorkflowVO create(String productId, WorkflowCreateRequest request) {
         Product product = loadProduct(productId);
-        int nextVersion = workflowRepository.findTopByProductIdOrderByVersionDesc(productId).orElse(0) + 1;
+        int nextVersion = workflowRepository.findTopByProductIdOrderByVersionDesc(productId)
+                .map(Workflow::getVersion).orElse(0) + 1;
 
         Workflow workflow = new Workflow();
         workflow.setId(UUID.randomUUID().toString());
