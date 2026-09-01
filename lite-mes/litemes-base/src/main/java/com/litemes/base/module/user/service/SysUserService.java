@@ -69,6 +69,12 @@ public class SysUserService {
         return toVO(getOrThrow(id));
     }
 
+    /** 启用状态用户简表（派工选操作员等下拉场景，不分页） */
+    public List<UserVO> listEnabled() {
+        return userRepository.findByDelFlagAndStatus(DEL_FLAG_NORMAL, STATUS_ENABLED).stream()
+                .map(this::toVO).toList();
+    }
+
     @Transactional
     public UserVO create(UserCreateRequest request) {
         if (userRepository.existsByUsernameAndDelFlag(request.getUsername(), DEL_FLAG_NORMAL)) {

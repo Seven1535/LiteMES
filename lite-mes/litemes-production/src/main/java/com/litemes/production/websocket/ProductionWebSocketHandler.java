@@ -1,63 +1,86 @@
 package com.litemes.production.websocket;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * 生产事件 WebSocket 处理器（骨架实现）。
- * 事件类型见《架构设计说明书》3.6：TASK_STARTED / TASK_COMPLETED / TASK_CLOSED /
- * ORDER_STATUS_CHANGED / WORKCENTER_STATUS_CHANGED。
- * 连接管理：断线由前端重连（指数退避），重连成功后前端全量拉取一次数据。
+ * 生产事件 WebSocket 端点处理器（/ws/production，见《架构设计说明书》3.6）：
+ * 连接成功推送 CONNECTED 确认；收到 ping 回 pong（心跳保活）；业务事件经 broadcast 广播给所有在线看板。
  */
 @Slf4j
+@Component
 public class ProductionWebSocketHandler extends TextWebSocketHandler {
 
-    /** 在线连接集合（单实例部署，线程安全） */
+    private static final String PING = "ping";
+    private static final String PONG = "pong";
+
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
+    private final ObjectMapper objectMapper;
+
+    public ProductionWebSocketHandler() {
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
+    }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
-        log.info("看板 WS 连接建立: {}, 当前在线: {}", session.getId(), sessions.size());
-        // 连接成功确认
-        send(session, "{\"type\":\"CONNECTED\"}");
+        // 连接成功确认（前端据此标记在线状态）
+        String json = objectMapper.writeValueAsString(
+                ProductionEvent.of("CONNECTED", Map.of("sessions", sessions.size())));
+        session.sendMessage(new TextMessage(json));
+        log.info("看板 WebSocket 连接建立: {}，当前在线 {}", session.getId(), sessions.size());
+    }
+
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        // 心跳保活：客户端每 30s 发 ping，服务端回 pong
+        if (PING.equals(message.getPayload())) {
+            session.sendMessage(new TextMessage(PONG));
+        }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         sessions.remove(session);
-        log.info("看板 WS 连接关闭: {}, 当前在线: {}", session.getId(), sessions.size());
+        log.info("看板 WebSocket 连接关闭: {}（{}），当前在线 {}", session.getId(), status, sessions.size());
     }
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        // TODO: 处理客户端消息（如心跳 pong），当前 MVP 以服务端单向推送为主
-    }
-
-    /**
-     * 广播生产事件给所有看板连接。
-     * TODO: 由业务模块（报工/工单状态流转/工位状态变更）触发调用。
-     */
-    public void broadcast(String eventJson) {
-        for (WebSocketSession session : sessions) {
-            if (session.isOpen()) {
-                send(session, eventJson);
-            }
+    /** 广播事件给所有在线会话；单个会话发送失败只清理该会话，不影响其他看板 */
+    public void broadcast(ProductionEvent event) {
+        if (sessions.isEmpty()) {
+            return;
         }
-    }
-
-    private void send(WebSocketSession session, String payload) {
+        String json;
         try {
-            session.sendMessage(new TextMessage(payload));
-        } catch (IOException e) {
-            log.warn("WS 消息发送失败: {}", session.getId(), e);
+            json = objectMapper.writeValueAsString(event);
+        } catch (Exception e) {
+            log.warn("WebSocket 事件序列化失败（{}）: {}", event.getType(), e.getMessage());
+            return;
+        }
+        for (WebSocketSession session : sessions) {
+            try {
+                if (session.isOpen()) {
+                    synchronized (session) {
+                        session.sendMessage(new TextMessage(json));
+                    }
+                } else {
+                    sessions.remove(session);
+                }
+            } catch (Exception e) {
+                log.warn("WebSocket 推送失败（会话 {}）: {}", session.getId(), e.getMessage());
+                sessions.remove(session);
+            }
         }
     }
 }

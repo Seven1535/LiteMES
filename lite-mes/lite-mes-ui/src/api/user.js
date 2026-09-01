@@ -6,6 +6,11 @@ export function listUsers(params) {
   return request.get('/v1/base/users', { params })
 }
 
+// 启用状态用户简表（派工选操作员等下拉场景）
+export function listEnabledUsers() {
+  return request.get('/v1/base/users/list')
+}
+
 // 用户详情
 export function getUser(id) {
   return request.get(`/v1/base/users/${id}`)

@@ -7,11 +7,13 @@ import com.litemes.common.core.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 工位内部接口：实现 litemes-api 的 WorkCenterClient 契约（供 litemes-production 派工时校验/推荐工位）。
@@ -23,6 +25,7 @@ import java.util.List;
 public class WorkCenterInnerController {
 
     private static final String DEL_FLAG_NORMAL = "0";
+    private static final Set<String> VALID_STATUS = Set.of("IDLE", "BUSY", "OFFLINE");
 
     private final WorkCenterRepository workCenterRepository;
 
@@ -42,6 +45,19 @@ public class WorkCenterInnerController {
                 .filter(w -> DEL_FLAG_NORMAL.equals(w.getDelFlag()))
                 .orElseThrow(() -> new BusinessException(404, "工位不存在"));
         return toDTO(workCenter);
+    }
+
+    /** 对应契约：PUT /inner/workcenters/{id}/status（派工开工置 BUSY、任务结束回 IDLE） */
+    @PutMapping("/workcenters/{id}/status")
+    public WorkCenterDTO changeStatus(@PathVariable String id, @RequestParam String status) {
+        if (!VALID_STATUS.contains(status)) {
+            throw new BusinessException(400, "非法的工位状态：" + status);
+        }
+        WorkCenter workCenter = workCenterRepository.findById(id)
+                .filter(w -> DEL_FLAG_NORMAL.equals(w.getDelFlag()))
+                .orElseThrow(() -> new BusinessException(404, "工位不存在"));
+        workCenter.setStatus(status);
+        return toDTO(workCenterRepository.save(workCenter));
     }
 
     private WorkCenterDTO toDTO(WorkCenter workCenter) {

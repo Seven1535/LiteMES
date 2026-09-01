@@ -4,6 +4,7 @@ import com.litemes.api.base.dto.WorkCenterDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -23,4 +24,8 @@ public interface WorkCenterClient {
     /** 工位详情（派工时校验工位状态） */
     @GetMapping("/workcenters/{id}")
     WorkCenterDTO getWorkCenter(@PathVariable("id") String id);
+
+    /** 更新工位状态（派工开工置 BUSY、任务结束回 IDLE） */
+    @PutMapping("/workcenters/{id}/status")
+    WorkCenterDTO changeStatus(@PathVariable("id") String id, @RequestParam("status") String status);
 }

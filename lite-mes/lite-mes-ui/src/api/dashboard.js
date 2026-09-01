@@ -1,17 +1,17 @@
-// 生产看板接口（litemes-production）
+// 生产看板接口（litemes-production，与设计规格 7.1 看板模块对齐）
 import request from './request'
 
-// 看板概览统计（工单/任务/设备状态数量）
-export function getOverview() {
-  return request.get('/v1/prod/dashboard/overview')
+// 概览数据（在制数/待下达数/完成数、工位状态统计、今日产出，后端 30s 缓存）
+export function getDashboardSummary() {
+  return request.get('/v1/prod/dashboard/summary')
 }
 
-// 设备实时状态（配合 WebSocket WORKCENTER_STATUS_CHANGED 刷新）
-export function listWorkCenterStatus() {
-  return request.get('/v1/prod/dashboard/workcenter-status')
+// 在制工单进度列表
+export function getWorkOrderProgress() {
+  return request.get('/v1/prod/dashboard/workorders')
 }
 
-// 今日报工趋势
-export function getTodayReportTrend() {
-  return request.get('/v1/prod/dashboard/today-report-trend')
+// 工位负载列表
+export function getWorkCenterLoad() {
+  return request.get('/v1/prod/dashboard/workcenters')
 }

@@ -7,6 +7,8 @@ import com.litemes.api.base.dto.WorkflowDTO;
 import com.litemes.common.code.CodeGenerator;
 import com.litemes.common.core.BusinessException;
 import com.litemes.common.core.PageResult;
+import com.litemes.production.module.dispatch.service.DispatchTaskService;
+import com.litemes.production.websocket.ProductionEventPublisher;
 import com.litemes.production.module.workorder.dto.WorkOrderCreateRequest;
 import com.litemes.production.module.workorder.dto.WorkOrderQueryRequest;
 import com.litemes.production.module.workorder.dto.WorkOrderUpdateRequest;
@@ -51,6 +53,8 @@ public class WorkOrderService {
     private final CodeGenerator codeGenerator;
     private final ProductClient productClient;
     private final WorkflowClient workflowClient;
+    private final DispatchTaskService dispatchTaskService;
+    private final ProductionEventPublisher eventPublisher;
 
     /** 分页查询：编号模糊 + 状态精确；产品/工艺名称经 Feign 聚合（按产品去重批量查） */
     public PageResult<WorkOrderVO> page(WorkOrderQueryRequest query) {
@@ -127,10 +131,12 @@ public class WorkOrderService {
         WorkOrder order = loadActive(id);
         requireStatus(order, STATUS_PLANNED, "仅已计划状态的工单可下达");
         order.setStatus(STATUS_RELEASED);
-        return toVO(workOrderRepository.save(order), new HashMap<>(), new HashMap<>());
+        WorkOrderVO vo = toVO(workOrderRepository.save(order), new HashMap<>(), new HashMap<>());
+        eventPublisher.publishOrderStatusChanged(order);
+        return vo;
     }
 
-    /** 关闭工单：已下达/生产中/已完工均可关闭；CLOSED 为终态（8.2） */
+    /** 关闭工单：已下达/生产中/已完工均可关闭；CLOSED 为终态（8.2）；未完成的派工任务级联关闭 */
     @Transactional
     public WorkOrderVO close(String id) {
         WorkOrder order = loadActive(id);
@@ -140,8 +146,14 @@ public class WorkOrderService {
         if (STATUS_PLANNED.equals(order.getStatus())) {
             throw new BusinessException(400, "已计划的工单请直接删除，无需关闭");
         }
+        int closedTasks = dispatchTaskService.closeByWorkOrder(order.getId());
         order.setStatus(STATUS_CLOSED);
-        return toVO(workOrderRepository.save(order), new HashMap<>(), new HashMap<>());
+        WorkOrderVO vo = toVO(workOrderRepository.save(order), new HashMap<>(), new HashMap<>());
+        eventPublisher.publishOrderStatusChanged(order);
+        if (closedTasks > 0) {
+            log.info("工单 {} 关闭，级联关闭 {} 个未完成派工任务", order.getOrderNo(), closedTasks);
+        }
+        return vo;
     }
 
     /** 删除工单：逻辑删除，仅已计划可删（已下达的只能关闭，8.2） */

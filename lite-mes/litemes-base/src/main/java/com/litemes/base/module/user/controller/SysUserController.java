@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * 用户管理接口（管理员）。路径规范见《开发规范说明文档》3.1。
  */
@@ -33,6 +35,12 @@ public class SysUserController {
     @GetMapping
     public AjaxResult<PageResult<UserVO>> page(@Valid UserQueryRequest query) {
         return AjaxResult.success(userService.page(query));
+    }
+
+    /** 启用状态用户简表（派工选操作员等下拉场景） */
+    @GetMapping("/list")
+    public AjaxResult<List<UserVO>> listEnabled() {
+        return AjaxResult.success(userService.listEnabled());
     }
 
     /** 用户详情 */

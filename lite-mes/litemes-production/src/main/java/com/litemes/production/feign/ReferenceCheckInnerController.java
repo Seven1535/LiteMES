@@ -1,5 +1,7 @@
 package com.litemes.production.feign;
 
+import com.litemes.production.module.dispatch.repository.DispatchTaskRepository;
+import com.litemes.production.module.dispatch.service.DispatchTaskService;
 import com.litemes.production.module.workorder.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ReferenceCheckInnerController {
 
+    private static final String DEL_FLAG_NORMAL = "0";
+
     private final WorkOrderRepository workOrderRepository;
+    private final DispatchTaskRepository dispatchTaskRepository;
 
     /** 对应契约：产品被工单引用计数（含逻辑删除的历史工单，安全优先） */
     @GetMapping("/products/{productId}")
@@ -25,10 +30,10 @@ public class ReferenceCheckInnerController {
         return (int) workOrderRepository.countByProductId(productId);
     }
 
-    /** 对应契约：工位进行中的派工任务数（派工模块开发后接入，当前无任务恒为 0） */
+    /** 对应契约：工位进行中的派工任务数（删除保护 8.4：有进行中任务禁止删除工位） */
     @GetMapping("/workcenters/{workCenterId}")
     public Integer countWorkCenterTasks(@PathVariable String workCenterId) {
-        // TODO 派工模块：dispatchTaskRepository.countByWorkCenterIdAndStatus(workCenterId, "PROCESSING")
-        return 0;
+        return (int) dispatchTaskRepository.countByDelFlagAndWorkCenterIdAndStatus(
+                DEL_FLAG_NORMAL, workCenterId, DispatchTaskService.STATUS_PROCESSING);
     }
 }

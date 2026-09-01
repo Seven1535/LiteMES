@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -30,6 +31,7 @@ public class WorkCenterService {
     private static final String DEL_FLAG_NORMAL = "0";
     private static final String DEL_FLAG_DELETED = "1";
     private static final String STATUS_IDLE = "IDLE";
+    private static final Set<String> VALID_STATUS = Set.of("IDLE", "BUSY", "OFFLINE");
 
     private final WorkCenterRepository workCenterRepository;
     private final ReferenceCheckClient referenceCheckClient;
@@ -90,6 +92,9 @@ public class WorkCenterService {
     /** 状态更新：派工开始置 BUSY、任务结束回 IDLE、手工停用置 OFFLINE（对外接口见设计规格 7.1） */
     @Transactional
     public WorkCenterVO updateStatus(String id, WorkCenterStatusRequest request) {
+        if (!VALID_STATUS.contains(request.getStatus())) {
+            throw new BusinessException(400, "非法的工位状态：" + request.getStatus());
+        }
         WorkCenter workCenter = loadActive(id);
         workCenter.setStatus(request.getStatus());
         return toVO(workCenterRepository.save(workCenter));

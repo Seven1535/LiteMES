@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,4 +26,7 @@ public interface SysUserRepository extends JpaRepository<SysUser, String> {
     Page<SysUser> findByDelFlagAndRole(String delFlag, String role, Pageable pageable);
 
     Page<SysUser> findByDelFlagAndRoleAndUsernameContaining(String delFlag, String role, String username, Pageable pageable);
+
+    /** 启用状态用户列表（派工选操作员等下拉场景） */
+    List<SysUser> findByDelFlagAndStatus(String delFlag, String status);
 }
