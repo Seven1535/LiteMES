@@ -30,50 +30,52 @@
         <span class="toolbar-title">工单列表</span>
         <el-button type="primary" @click="openDialog()">创建工单</el-button>
       </div>
-      <el-table v-loading="loading" :data="rows" border stripe>
-        <el-table-column prop="orderNo" label="工单编号" width="170" />
-        <el-table-column label="产品" min-width="160" show-overflow-tooltip>
-          <template #default="{ row }">
-            {{ row.productCode ? `${row.productCode} - ${row.productName || ''}` : row.productId }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="workflowVersionName" label="工艺版本" width="100" />
-        <el-table-column prop="quantity" label="计划数量" width="90" align="center" />
-        <el-table-column label="完工进度" width="150">
-          <template #default="{ row }">
-            <el-progress :percentage="progressOf(row)" :stroke-width="10" />
-          </template>
-        </el-table-column>
-        <el-table-column label="优先级" width="80" align="center">
-          <template #default="{ row }">
-            <el-tag size="small" :type="priorityMap[row.priority]?.type">
-              {{ priorityMap[row.priority]?.text }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="状态" width="90" align="center">
-          <template #default="{ row }">
-            <StatusTag :status="row.status" />
-          </template>
-        </el-table-column>
-        <el-table-column label="计划日期" width="190">
-          <template #default="{ row }">
-            {{ row.planStartDate || '-' }} ~ {{ row.planEndDate || '-' }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
-          <template #default="{ row }">
-            <template v-if="row.status === 'PLANNED'">
-              <el-button type="primary" link size="small" @click="openDialog(row)">编辑</el-button>
-              <el-button type="success" link size="small" @click="handleRelease(row)">下达</el-button>
-              <ConfirmButton title="确定删除该工单吗？" @confirm="handleDelete(row)">删除</ConfirmButton>
+      <div class="table-body">
+        <el-table v-loading="loading" :data="rows" border stripe height="100%">
+          <el-table-column prop="orderNo" label="工单编号" width="170" />
+          <el-table-column label="产品" min-width="160" show-overflow-tooltip>
+            <template #default="{ row }">
+              {{ row.productCode ? `${row.productCode} - ${row.productName || ''}` : row.productId }}
             </template>
-            <ConfirmButton v-else-if="row.status !== 'CLOSED'" title="关闭后不可再操作，确定关闭吗？"
-                           @confirm="handleClose(row)">关闭</ConfirmButton>
-            <span v-else class="closed-text">已关闭</span>
-          </template>
-        </el-table-column>
-      </el-table>
+          </el-table-column>
+          <el-table-column prop="workflowVersionName" label="工艺版本" width="100" />
+          <el-table-column prop="quantity" label="计划数量" width="90" align="center" />
+          <el-table-column label="完工进度" width="150">
+            <template #default="{ row }">
+              <el-progress :percentage="progressOf(row)" :stroke-width="10" />
+            </template>
+          </el-table-column>
+          <el-table-column label="优先级" width="80" align="center">
+            <template #default="{ row }">
+              <el-tag size="small" :type="priorityMap[row.priority]?.type">
+                {{ priorityMap[row.priority]?.text }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" width="90" align="center">
+            <template #default="{ row }">
+              <StatusTag :status="row.status" />
+            </template>
+          </el-table-column>
+          <el-table-column label="计划日期" width="190">
+            <template #default="{ row }">
+              {{ row.planStartDate || '-' }} ~ {{ row.planEndDate || '-' }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="180" fixed="right">
+            <template #default="{ row }">
+              <template v-if="row.status === 'PLANNED'">
+                <el-button type="primary" link size="small" @click="openDialog(row)">编辑</el-button>
+                <el-button type="success" link size="small" @click="handleRelease(row)">下达</el-button>
+                <ConfirmButton title="确定删除该工单吗？" @confirm="handleDelete(row)">删除</ConfirmButton>
+              </template>
+              <ConfirmButton v-else-if="row.status !== 'CLOSED'" title="关闭后不可再操作，确定关闭吗？"
+                             @confirm="handleClose(row)">关闭</ConfirmButton>
+              <span v-else class="closed-text">已关闭</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
       <Pagination v-model:page="query.pageNum" v-model:size="query.pageSize" :total="total"
                   @update:page="loadData" @update:size="loadData" />
     </div>
@@ -127,6 +129,7 @@ import {
   listWorkOrders, createWorkOrder, updateWorkOrder, releaseWorkOrder, closeWorkOrder, deleteWorkOrder
 } from '@/api/workorder'
 import { listProducts } from '@/api/product'
+import { DEFAULT_PAGE_SIZE } from '@/utils/constants'
 
 // 优先级映射（设计规格：1=紧急, 2=高, 3=中, 4=低）
 const priorityMap = {
@@ -137,7 +140,7 @@ const priorityMap = {
 }
 
 // 查询条件
-const query = reactive({ pageNum: 1, pageSize: 10, orderNo: '', status: '' })
+const query = reactive({ pageNum: 1, pageSize: DEFAULT_PAGE_SIZE, orderNo: '', status: '' })
 const rows = ref([])
 const total = ref(0)
 const loading = ref(false)

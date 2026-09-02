@@ -20,9 +20,12 @@ body {
   background-color: $page-bg;
 }
 
-// 页面通用容器：所有内容页统一使用
+// 页面通用容器：所有内容页统一使用（撑满内容区，列表页不留大片空白）
 .page-container {
   padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 // 搜索栏统一风格
@@ -33,11 +36,21 @@ body {
   border-radius: 4px;
 }
 
-// 表格卡片统一风格
+// 表格卡片统一风格（列表页中撑满剩余高度）
 .table-card {
   background: $card-bg;
   padding: 16px;
   border-radius: 4px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+// 表格填充区：表格占满卡片剩余高度并内部滚动，使分页固定在卡片底部
+.table-body {
+  flex: 1;
+  min-height: 0;
 }
 
 // 表格工具栏（标题/新增按钮所在行）

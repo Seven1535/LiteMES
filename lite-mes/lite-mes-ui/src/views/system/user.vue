@@ -27,32 +27,34 @@
         <span>用户列表</span>
         <el-button type="primary" @click="openDialog()">新增用户</el-button>
       </div>
-      <el-table v-loading="loading" :data="rows" stripe>
-        <el-table-column prop="username" label="用户名" min-width="120" />
-        <el-table-column prop="realName" label="姓名" min-width="120" />
-        <el-table-column label="角色" width="110">
-          <template #default="{ row }">
-            <el-tag :type="row.role === 'ADMIN' ? 'primary' : 'info'" size="small">
-              {{ row.role === 'ADMIN' ? '管理员' : '操作工' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="状态" width="90">
-          <template #default="{ row }">
-            <StatusTag :status="row.status" />
-          </template>
-        </el-table-column>
-        <el-table-column label="创建时间" width="170">
-          <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
-        </el-table-column>
-        <el-table-column label="操作" width="210" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" size="small" link @click="openDialog(row)">编辑</el-button>
-            <el-button type="warning" size="small" link @click="openResetDialog(row)">重置密码</el-button>
-            <ConfirmButton link title="确定删除该用户吗？" @confirm="handleDelete(row)">删除</ConfirmButton>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="table-body">
+        <el-table v-loading="loading" :data="rows" stripe height="100%">
+          <el-table-column prop="username" label="用户名" min-width="120" />
+          <el-table-column prop="realName" label="姓名" min-width="120" />
+          <el-table-column label="角色" width="110">
+            <template #default="{ row }">
+              <el-tag :type="row.role === 'ADMIN' ? 'primary' : 'info'" size="small">
+                {{ row.role === 'ADMIN' ? '管理员' : '操作工' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" width="90">
+            <template #default="{ row }">
+              <StatusTag :status="row.status" />
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" width="170">
+            <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+          </el-table-column>
+          <el-table-column label="操作" width="210" fixed="right">
+            <template #default="{ row }">
+              <el-button type="primary" size="small" link @click="openDialog(row)">编辑</el-button>
+              <el-button type="warning" size="small" link @click="openResetDialog(row)">重置密码</el-button>
+              <ConfirmButton link title="确定删除该用户吗？" @confirm="handleDelete(row)">删除</ConfirmButton>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
       <Pagination v-model:page="query.pageNum" v-model:size="query.pageSize"
                   :total="total" @update:page="loadData" @update:size="loadData" />
     </div>

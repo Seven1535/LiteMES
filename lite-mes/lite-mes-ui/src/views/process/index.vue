@@ -22,32 +22,34 @@
       <div class="toolbar">
         <span class="toolbar-title">工艺版本列表</span>
       </div>
-      <el-table v-loading="loading" :data="rows" border stripe>
-        <el-table-column prop="version" label="版本号" width="90" align="center" />
-        <el-table-column prop="versionName" label="版本标识" width="120" />
-        <el-table-column prop="description" label="版本说明" min-width="200" show-overflow-tooltip />
-        <el-table-column label="状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="workflowStatusMap[row.status]?.type || 'info'">
-              {{ workflowStatusMap[row.status]?.text || row.status }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="创建时间" width="170">
-          <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
-        </el-table-column>
-        <el-table-column label="操作" width="260" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="openEditor(row)">编辑画布</el-button>
-            <el-button v-if="row.status === 'DRAFT'" type="success" link size="small"
-                       @click="handleActivate(row)">激活</el-button>
-            <el-button v-if="row.status === 'DRAFT'" type="primary" link size="small"
-                       @click="openEditMeta(row)">改信息</el-button>
-            <ConfirmButton v-if="row.status === 'DRAFT'" title="确定删除该工艺版本吗？"
-                           @confirm="handleDelete(row)">删除</ConfirmButton>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="table-body">
+        <el-table v-loading="loading" :data="rows" border stripe height="100%">
+          <el-table-column prop="version" label="版本号" width="90" align="center" />
+          <el-table-column prop="versionName" label="版本标识" width="120" />
+          <el-table-column prop="description" label="版本说明" min-width="200" show-overflow-tooltip />
+          <el-table-column label="状态" width="100" align="center">
+            <template #default="{ row }">
+              <el-tag :type="workflowStatusMap[row.status]?.type || 'info'">
+                {{ workflowStatusMap[row.status]?.text || row.status }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" width="170">
+            <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+          </el-table-column>
+          <el-table-column label="操作" width="260" fixed="right">
+            <template #default="{ row }">
+              <el-button type="primary" link size="small" @click="openEditor(row)">编辑画布</el-button>
+              <el-button v-if="row.status === 'DRAFT'" type="success" link size="small"
+                         @click="handleActivate(row)">激活</el-button>
+              <el-button v-if="row.status === 'DRAFT'" type="primary" link size="small"
+                         @click="openEditMeta(row)">改信息</el-button>
+              <ConfirmButton v-if="row.status === 'DRAFT'" title="确定删除该工艺版本吗？"
+                             @confirm="handleDelete(row)">删除</ConfirmButton>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
       <el-empty v-if="!productId" description="请先选择产品" :image-size="80" />
     </div>
 

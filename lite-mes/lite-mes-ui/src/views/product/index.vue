@@ -31,25 +31,27 @@
         <span class="toolbar-title">产品列表</span>
         <el-button type="primary" @click="openDialog()">新增产品</el-button>
       </div>
-      <el-table v-loading="loading" :data="rows" border stripe>
-        <el-table-column prop="productCode" label="产品编码" width="160" />
-        <el-table-column prop="productName" label="产品名称" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-        <el-table-column label="状态" width="90" align="center">
-          <template #default="{ row }">
-            <StatusTag :status="row.status" />
-          </template>
-        </el-table-column>
-        <el-table-column label="创建时间" width="170">
-          <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
-        </el-table-column>
-        <el-table-column label="操作" width="140" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="openDialog(row)">编辑</el-button>
-            <ConfirmButton title="确定删除该产品吗？" @confirm="handleDelete(row)">删除</ConfirmButton>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div class="table-body">
+        <el-table v-loading="loading" :data="rows" border stripe height="100%">
+          <el-table-column prop="productCode" label="产品编码" width="160" />
+          <el-table-column prop="productName" label="产品名称" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
+          <el-table-column label="状态" width="90" align="center">
+            <template #default="{ row }">
+              <StatusTag :status="row.status" />
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" width="170">
+            <template #default="{ row }">{{ formatDateTime(row.createdAt) }}</template>
+          </el-table-column>
+          <el-table-column label="操作" width="140" fixed="right">
+            <template #default="{ row }">
+              <el-button type="primary" link size="small" @click="openDialog(row)">编辑</el-button>
+              <ConfirmButton title="确定删除该产品吗？" @confirm="handleDelete(row)">删除</ConfirmButton>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
       <Pagination v-model:page="query.pageNum" v-model:size="query.pageSize" :total="total"
                   @update:page="loadData" @update:size="loadData" />
     </div>
@@ -90,11 +92,12 @@ import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { listProducts, createProduct, updateProduct, deleteProduct } from '@/api/product'
 import { formatDateTime } from '@/utils/format'
+import { DEFAULT_PAGE_SIZE } from '@/utils/constants'
 
 // 查询条件
 const query = reactive({
   pageNum: 1,
-  pageSize: 10,
+  pageSize: DEFAULT_PAGE_SIZE,
   productCode: '',
   productName: '',
   status: ''

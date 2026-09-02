@@ -15,11 +15,11 @@
 </template>
 
 <script setup>
-import { PAGE_SIZE_OPTIONS } from '@/utils/constants'
+import { PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE } from '@/utils/constants'
 
 defineProps({
   page: { type: Number, default: 1 },
-  size: { type: Number, default: 10 },
+  size: { type: Number, default: DEFAULT_PAGE_SIZE },
   total: { type: Number, default: 0 }
 })
 

@@ -57,7 +57,7 @@ export const STATUS_MAP = {
 
 // 分页
 export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100]
-export const DEFAULT_PAGE_SIZE = 10
+export const DEFAULT_PAGE_SIZE = 20
 
 // WebSocket 事件类型（与后端 ProductionWebSocketHandler 推送一致）
 export const WS_EVENT = {
